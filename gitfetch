@@ -1,0 +1,157 @@
+#!/usr/bin/env python3
+
+"""
+    author:     Rafael Schreiber
+    version:    v0.0.1
+    date:       04-04-2018
+    desc:       With gitfetch you can fetch repos from other GitHub users,
+                also, when you have no account.
+"""
+
+import os
+import sys
+
+
+HOME = os.getenv("HOME")
+PWD = os.getenv("PWD")
+
+
+def isGit():
+    if os.system("which git > /dev/null 2>&1") != 0:
+        print("Sorry, git isn't installed please install git and restart the program")
+        exit(1)
+    else:
+        return True
+
+
+def isConnection():
+    if os.system("ping -c 1 github.com > /dev/null 2>&1") == 0:
+        return True
+    else:
+        print("Sorry, there is no connection to the GitHub servers.")
+        exit(1)
+
+
+def isValidUser(username):
+    if username is None:
+        return False
+    if os.system("curl -s --head https://github.com/" + username +
+                 " | head -n 1 | grep \"HTTP/1.[01] [23]..\" > /dev/null") == 0:
+        return True
+    else:
+        return False
+
+
+def isValidRepo(username, repo):
+    if repo is None:
+        return False
+    if os.system("curl -s --head https://github.com/" + username + '/' + repo +
+                 " | head -n 1 | grep \"HTTP/1.[01] [23]..\" > /dev/null") == 0:
+        return True
+    else:
+        return False
+
+
+def pathCleaner(path):
+    if path[0] == '~':
+        return HOME + path[1:]
+    elif path[0] == '/':
+        return path
+    else:
+        return PWD + '/' + path
+
+
+def download(user, repo, location):
+    try:
+        os.makedirs(location)
+    except PermissionError:
+        print("Sorry, you don't have the permissions to save the files in this location")
+        exit(1)
+    except FileExistsError:
+        pass
+    os.chdir(location)
+    os.system("git clone https://github.com/" + user + "/" + repo)
+
+
+def getUsername():
+    print("From which user, do you want to fetch some repositories?")
+    while True:
+        username = str(input(">>> "))
+        if isValidUser(username):
+            return username
+        else:
+            print("Sorry this user doesn't exist\n")
+
+
+def getRepo(username):
+    print("Which repository from " + username + " do you want to download?")
+    while True:
+        repo = str(input(">>> "))
+        if isValidRepo(username, repo):
+            return repo
+        else:
+            print("Sorry this repository doesn't exist\n")
+
+
+def help():
+    print("gitfetch, version 0.0.1")
+    print("(Licensed under the GNU General Public License v3.0)\n")
+
+    print("usage: gitfetch [-h] [username] [repository] [location]\n")
+
+    print("h : Displays this page\n")
+
+    print("username   : GitHub username, where the repository is located")
+    print("repository : name of the repository")
+    print("location   : where the download should be saved (default is pwd)\n")
+
+    print("NOTE: The program asks if you have given wrong command line arguments\n")
+
+    print("Please send bugs and crashes to raf.schreiber@gmail.com Thanks :)")
+
+
+def main():
+    # corrects all command line arguments
+    for i in [1, 2, 3]:
+        try:
+            sys.argv[i] = sys.argv[i]
+        except IndexError:
+            sys.argv.append(None)
+
+    # get help
+    if sys.argv[1] == "-h" or sys.argv[1] == "--help":
+        help()
+        exit(0)
+
+    isGit()  # crashes when git isn't installed
+    isConnection()  # crashes when there is no connection to the GitHub servers
+
+    # get username
+    if isValidUser(sys.argv[1]):
+        username = sys.argv[1]
+    else:
+        username = getUsername()
+
+    # get repo
+    if isValidRepo(username, sys.argv[2]):
+        repo = sys.argv[2]
+    else:
+        repo = getRepo(username)
+
+    # get saving location
+    if sys.argv[3] is None:
+        location = "./"
+    else:
+        location = pathCleaner(sys.argv[3])
+
+    # download repo
+    download(username, repo, location)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        exit(1)
+    except EOFError:
+        exit(1)

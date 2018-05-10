@@ -3,6 +3,7 @@ all:
 
 install:
 	cp gitfetch /usr/bin/gitfetch
+	chmod 755 /usr/bin/gitfetch
 
 uninstall:
 	rm /usr/bin/gitfetch

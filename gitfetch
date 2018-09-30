@@ -49,7 +49,7 @@ def isValidRepo(username, repo):
                  " | head -n 1 | grep \"HTTP/1.[01] [23]..\" > /dev/null") == 0:
         return True
     else:
-        print("It seems, that yur repo is private. Do you want to change it? (y/n)")
+        print("It seems, that your repo is private. Do you want to change it? (y/n)")
         while True:
             ans = str(input(">>> "))
             if ans.lower() == "y":

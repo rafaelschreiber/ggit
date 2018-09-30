@@ -49,7 +49,15 @@ def isValidRepo(username, repo):
                  " | head -n 1 | grep \"HTTP/1.[01] [23]..\" > /dev/null") == 0:
         return True
     else:
-        return False
+        print("It seems, that yur repo is private. Do you want to change it? (y/n)")
+        while True:
+            ans = str(input(">>> "))
+            if ans.lower() == "y":
+                getRepo(username)
+            elif ans.lower() == "n":
+                return True
+            else:
+                print("Invalid input!\n")
 
 
 def pathCleaner(path):

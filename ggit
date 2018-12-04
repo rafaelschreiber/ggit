@@ -90,8 +90,8 @@ def download(user, repo, location):
     os.system("git clone https://" + SERVER + "/" + user + "/" + repo)
 
 
-def getUsername():
-    print("From which user, do you want to fetch some repositories?")
+def getUsername(msg):
+    print(msg)
     while True:
         username = str(input(">>> "))
         if isValidUser(username):
@@ -115,7 +115,7 @@ def clone():
     if isValidUser(sys.argv[2]):
         username = sys.argv[2]
     else:
-        username = getUsername()
+        username = getUsername("From which user, do you want to fetch some repositories?")
 
     # get repo
     if isValidRepo(username, sys.argv[3]):
@@ -161,7 +161,7 @@ def init():
     if isValidUser(sys.argv[2]):
         username = sys.argv[2]
     else:
-        username = getUsername()
+        username = getUsername("On which user do you want to initialize a repository?")
 
     if sys.argv[3] is None:
         print("Enter a project name:")
@@ -170,11 +170,16 @@ def init():
             if len(projname) == 0:
                 print("Invalid input!\n")
                 continue
+            isContinue = False
             for char in projname:
                 if char == ' ':
                     print("Project name can not contain spaces!\n")
-                    continue
-            break
+                    isContinue = True
+                    break
+            if isContinue:
+                continue
+            else:
+                break
     else:
         projname = sys.argv[3]
 

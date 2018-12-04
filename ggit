@@ -150,19 +150,8 @@ def push():
         os.system("git commit -m \"" + commit_message + "\"")
         os.system("git push")
 
-    elif isValidPath(sys.argv[2]):
-        location = pathCleaner(sys.argv[2])
-        if sys.argv[3] is None:
-            print("Enter a commit message:")
-            commit_message = str(input(">>> "))
-            os.chdir(location)
-            os.system("git add -A")
-            os.system("git commit -m \"" + commit_message + "\"")
-            os.system("git push")
-
     else:
-        print("Enter a commit message:")
-        commit_message = str(input(">>> "))
+        commit_message = sys.argv[2]
         os.system("git add -A")
         os.system("git commit -m \"" + commit_message + "\"")
         os.system("git push")
